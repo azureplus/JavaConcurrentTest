@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="30">
+    <properties>
+        <property name="LOG_NAME">testlogs</property>
+        <property name="BACKUP_HOME">${LOG_NAME}/backup</property>
+        <property name="STAT_NAME">stat</property>
+        <property name="SERVER_NAME">testlogs</property>
+        <property name="ERROR_SERVER_NAME">error</property>
+    </properties>
+    <CustomLevels>
+        <CustomLevel name="RESULT" intLevel="350"/>
+        <CustomLevel name="NOTICE" intLevel="450"/>
+        <CustomLevel name="VERBOSE" intLevel="550"/>
+    </CustomLevels>
+    <appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} %level [%thread][%file:%line] - %msg%n"/>
+        </Console>
+        <RollingRandomAccessFile name="RollingRandomAccessFile" fileName="logs/${LOG_NAME}.log"
+                                 filePattern="${LOG_NAME}/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>%d %p %c [%t] %m%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="250 MB"/>
+            </Policies>
+        </RollingRandomAccessFile>
+        <RollingRandomAccessFile name="LogInfoRandomAccessFile" fileName="logs/${LOG_NAME}.info.log"
+                                 filePattern="${LOG_NAME}/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>%d %p %c [%t] %m%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="250 MB"/>
+            </Policies>
+        </RollingRandomAccessFile>
+        <RollingRandomAccessFile name="LogErrorRandomAccessFile" fileName="logs/${LOG_NAME}.error.log"
+                                 filePattern="${LOG_NAME}/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>%d %p %c [%t] %m%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="250 MB"/>
+            </Policies>
+        </RollingRandomAccessFile>
+
+
+        <Async name="AsyncRandomAccessFile">
+            <AppenderRef ref="RollingRandomAccessFile"/>
+        </Async>
+        <Async name="AsyncParseResult">
+            <AppenderRef ref="LogInfoRandomAccessFile"/>
+        </Async>
+    </appenders>
+    <loggers>
+        <AsyncLogger name="Invoke_Service" level="debug">
+            <appender-ref ref="Console"/>
+            <appender-ref ref="AsyncRandomAccessFile" level="INFO"/>
+        </AsyncLogger>
+        <AsyncLogger name="ParseResult" level="info" includeLocation="true" additivity="false">
+            <appender-ref ref="Console"/>
+            <appender-ref ref="LogErrorRandomAccessFile" level="Error"/>
+            <appender-ref ref="LogInfoRandomAccessFile" level="INFO"/>
+        </AsyncLogger>
+        <Asyncroot level="info">
+            <appender-ref ref="Console"/>
+            <appender-ref ref="AsyncRandomAccessFile" level="INFO"/>
+        </Asyncroot>
+    </loggers>
+</Configuration>
